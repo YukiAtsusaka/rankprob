@@ -1,6 +1,6 @@
 Package: rankprob
 Title: Supports computing probability of ranked choices from multinomial models
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     c(
     person("Noah", "Greifer", , "noah.greifer@gmail.com", role = c("aut", "cre"),

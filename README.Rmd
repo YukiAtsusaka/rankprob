@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+options(width = 100)
 ```
 
 # rankprob
@@ -18,11 +19,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rankprob is to ...
+`rankprob` facilitates the computation of the predicted probability of a given ranking of choices from the output of a multinomial regression model, in particular, making it easy to use these predicted probabilities in `marginaleffects` and `clarify`. It does so by providing a new type of prediction for multinomial models, which is activated by running `convert_rankprob()` on the multinomial or ordinal regression output object, e.g., the output of a call to `nnet::multinom()`, `MASS::polr()`, or `WeightIt::multinom_weightit()`.
 
 ## Installation
 
-You can install the development version of rankprob from [GitHub](https://github.com/) with:
+You can install the development version of `rankprob` from [GitHub](https://github.com/ngreifer/rankprob) with:
 
 ``` r
 # install.packages("pak")
@@ -31,13 +32,20 @@ pak::pak("ngreifer/rankprob")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Below, we use `rankprob` to transform the output of `nnet::multinom()` to compute the predict probability of two ordered rankings and the average marginal effect of the predictors on the probability of a given ranking.
 
-```{r example, eval = FALSE}
+```{r example, warning=FALSE}
 library(rankprob)
 
+set.seed(123)
+n <- 500
+data <- data.frame(x1 = rnorm(n),
+                   x2 = rnorm(n),
+                   x3 = factor(sample(c("t", "c"), n, replace = TRUE)),
+                   y = sample(LETTERS[1:4], n, TRUE))
+
 fit <- nnet::multinom(y ~ x1 + x2 + x3, data = data,
-                      Hess = TRUE)
+                      Hess = TRUE, trace = FALSE)
 
 fit <- convert_rankprob(fit)
 
@@ -46,5 +54,6 @@ p <- predict(fit, rankings = list(c("A", "B", "C", "D"),
 
 head(p)
 
-marginaleffects::avg_slopes(fit, type = "rank_probs")
+marginaleffects::avg_slopes(fit, type = "rank_probs",
+                            rankings = list(c("A", "B", "C", "D")))
 ```
